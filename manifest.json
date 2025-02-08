@@ -3,8 +3,8 @@
 	"name": "Conknow阅读助手",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "使用 Textin API 进行图片和文档的 OCR 识别，帮助您更高效地阅读和整理内容。支持多种格式，包括图片、PDF、Word等。",
-	"author": "Your Name",
+	"description": "使用 Textin API 进行图片和文档的 OCR 识别，加上AI解读，帮助您更高效地阅读和整理内容。支持多种格式，包括图片、PDF、Word等。",
+	"author": "Jason Shui",
 	"authorUrl": "",
 	"isDesktopOnly": false
 }

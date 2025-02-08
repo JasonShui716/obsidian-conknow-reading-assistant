@@ -1,5 +1,9 @@
 {
   "serverUrl": "https://api.textin.com/ai/service/v1/pdf_to_markdown",
   "textinApiId": "e3f8d1f591852fde77007ab90e1a78d3",
-  "textinApiSecret": "3022cfad99f029b5b834acc02fe86d7e"
+  "textinApiSecret": "3022cfad99f029b5b834acc02fe86d7e",
+  "deepseekBaseUrl": "http://38.242.241.73:3000/v1",
+  "deepseekApiKey": "sk-4C7EqsK5A6pNGVrlDe8766Fd68F9492dA1AcB74850C91f7d",
+  "deepseekModel": "o1-mini",
+  "deepseekSystemPrompt": "你是一名博学大师，你的学生会给你发送一些书籍段落，请想象你的学生是这个领域的初学者，希望能理解这些内容并将这些知识应用到实际领域；他对计算机领域和初级经济学已经有了比较好的理解，根据他给定的内容做一些生动的解释和联想。"
 }

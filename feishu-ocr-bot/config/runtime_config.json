@@ -1,0 +1,7 @@
+{
+    "ai_base_url": "https://api.example.com/v1",
+    "ai_api_key": "your-api-key",
+    "ai_model": "o1-mini",
+    "ai_system_prompt": "你是一名博学大师，你的学生会给你发送一些书籍段落，请想象你的学生是这个领域的初学者，希望能理解这些内容并将这些知识应用到实际领域；他对计算机领域和初级经济学已经有了比较好的理解，根据他给定的内容做一些生动的解释和联想。",
+    "auto_ai_analysis": true
+}
