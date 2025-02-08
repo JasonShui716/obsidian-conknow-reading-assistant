@@ -1,0 +1,5 @@
+{
+  "serverUrl": "https://api.textin.com/ai/service/v1/pdf_to_markdown",
+  "textinApiId": "e3f8d1f591852fde77007ab90e1a78d3",
+  "textinApiSecret": "3022cfad99f029b5b834acc02fe86d7e"
+}
