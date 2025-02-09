@@ -8,6 +8,8 @@
 
 这是一个 Obsidian 插件，它能够帮助用户通过 OCR 技术识别图片中的文字，并利用 AI 进行智能解读，支持在普通笔记和 Canvas 画布中使用。
 
+![screenshot](./function_presentation.png)
+
 ## 主要功能
 
 - **OCR 图片识别**

@@ -6,6 +6,8 @@
 
 这是一个功能强大的飞书机器人服务，它不仅能自动识别群聊中的图片文字，还支持与Obsidian知识库同步，并提供AI智能解读功能。
 
+![screenshot](./function_presentation.png)
+
 ## 主要功能
 
 - **OCR 文字识别**
