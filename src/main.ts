@@ -26,7 +26,7 @@ export default class ConknowReadingAssistant extends Plugin {
 				// 检查光标是否在图片链接上
 				const imageRegex = /!\[\[(.*?)\]\]/;
 				const match = line.match(imageRegex);
-				
+
 				if (match) {
 					menu.addItem((item) => {
 						item
@@ -55,9 +55,9 @@ export default class ConknowReadingAssistant extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on('canvas:node-menu', (menu: Menu, node: any, canvas: any) => {
 				// 处理图片节点
-				if (node?.file instanceof TFile && 
+				if (node?.file instanceof TFile &&
 					['png', 'jpg', 'jpeg', 'gif', 'bmp', 'pdf'].includes(node?.file?.extension)) {
-					
+
 					menu.addItem((item: MenuItem) => {
 						item
 							.setTitle('OCR解析')
@@ -69,14 +69,14 @@ export default class ConknowReadingAssistant extends Plugin {
 									if (!ocrResult) {
 										throw new Error('OCR 处理失败');
 									}
-									
+
 									if (!node.canvas) {
 										throw new Error('无法获取 Canvas 实例');
 									}
 
 									// 计算节点尺寸
 									const { width, height } = calculateNodeDimensions(ocrResult.length);
-									
+
 									// 创建文本节点
 									const textNode = createTextNode(
 										node.canvas,
@@ -89,7 +89,7 @@ export default class ConknowReadingAssistant extends Plugin {
 
 									// 添加节点
 									node.canvas.addNode(textNode);
-									
+
 									// 添加连接线
 									addEdge(
 										node.canvas,
@@ -125,14 +125,14 @@ export default class ConknowReadingAssistant extends Plugin {
 									if (!ocrResult) {
 										throw new Error('OCR 处理失败');
 									}
-									
+
 									if (!node.canvas) {
 										throw new Error('无法获取 Canvas 实例');
 									}
 
 									// 计算OCR结果节点尺寸
 									const { width: ocrWidth, height: ocrHeight } = calculateNodeDimensions(ocrResult.length);
-									
+
 									// 创建OCR结果节点
 									const ocrNode = createTextNode(
 										node.canvas,
@@ -145,7 +145,7 @@ export default class ConknowReadingAssistant extends Plugin {
 
 									// 添加OCR结果节点
 									node.canvas.addNode(ocrNode);
-									
+
 									// 添加连接线
 									addEdge(
 										node.canvas,
@@ -217,7 +217,7 @@ export default class ConknowReadingAssistant extends Plugin {
 
 		// 计算AI解读结果节点尺寸
 		const { width: aiWidth, height: aiHeight } = calculateNodeDimensions(aiResult.length);
-		
+
 		// 创建AI解读结果节点
 		const aiNode = createTextNode(
 			canvas,
@@ -230,7 +230,7 @@ export default class ConknowReadingAssistant extends Plugin {
 
 		// 添加AI解读结果节点
 		canvas.addNode(aiNode);
-		
+
 		// 添加连接线
 		addEdge(
 			canvas,
@@ -270,8 +270,8 @@ export default class ConknowReadingAssistant extends Plugin {
 		const loadingNotice = new Notice('正在进行 OCR 解析，请稍候...', 0);
 		try {
 			const result = await this.sendToTextin(imagePath);
-			editor.replaceRange('\n' + result + '\n', 
-				{ line: line + 1, ch: 0 }, 
+			editor.replaceRange('\n' + result + '\n',
+				{ line: line + 1, ch: 0 },
 				{ line: line + 1, ch: 0 }
 			);
 			loadingNotice.hide();
@@ -288,8 +288,8 @@ export default class ConknowReadingAssistant extends Plugin {
 		try {
 			const ocrResult = await this.sendToTextin(imagePath);
 			const aiResult = await this.sendToDeepseek(ocrResult);
-			editor.replaceRange('\n' + ocrResult + '\n\n**AI解读：**\n' + aiResult + '\n', 
-				{ line: line + 1, ch: 0 }, 
+			editor.replaceRange('\n' + ocrResult + '\n\n**AI解读：**\n' + aiResult + '\n',
+				{ line: line + 1, ch: 0 },
 				{ line: line + 1, ch: 0 }
 			);
 			loadingNotice.hide();
@@ -298,6 +298,35 @@ export default class ConknowReadingAssistant extends Plugin {
 			loadingNotice.hide();
 			new Notice('处理失败：' + (error as Error).message);
 		}
+	}
+
+	// 重试工具函数
+	private async retry<T>(
+		fn: () => Promise<T>,
+		retries: number = 3,
+		delay: number = 1000,
+		backoff: number = 2
+	): Promise<T> {
+		let currentDelay = delay;
+		let lastError: Error | null = null;
+
+		for (let attempt = 0; attempt < retries; attempt++) {
+			try {
+				return await fn();
+			} catch (error) {
+				lastError = error as Error;
+				if (attempt === retries - 1) {
+					console.error(`重试${retries}次后仍然失败:`, error);
+					throw error;
+				}
+
+				console.warn(`第${attempt + 1}次尝试失败: ${error.message}, ${currentDelay}ms后重试`);
+				await new Promise(resolve => setTimeout(resolve, currentDelay));
+				currentDelay *= backoff;
+			}
+		}
+
+		throw lastError;
 	}
 
 	// 发送到 Textin API 处理
@@ -319,33 +348,87 @@ export default class ConknowReadingAssistant extends Plugin {
 			'x-ti-secret-code': this.settings.textinApiSecret
 		};
 
-		const response = await fetch(this.settings.serverUrl, {
-			method: 'POST',
-			headers: headers,
-			body: arrayBuffer
+		// 使用重试机制发送请求
+		const response = await this.retry(async () => {
+			const resp = await fetch(this.settings.serverUrl, {
+				method: 'POST',
+				headers: headers,
+				body: arrayBuffer
+			});
+
+			if (!resp.ok) {
+				throw new Error('上传失败：' + resp.statusText);
+			}
+
+			return resp;
 		});
 
-		if (!response.ok) {
-			throw new Error('上传失败：' + response.statusText);
-		}
-
 		const result = await response.json();
-		
+
 		if (result.code !== 200) {
 			throw new Error('API 返回错误：' + result.message);
 		}
 
-		return result.result.markdown;
+		let markdown = result.result.markdown;
+
+		// 处理远程图片链接
+		const imagePattern = /!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g;
+		const matches = [...markdown.matchAll(imagePattern)];
+		console.log(`发现 ${matches.length} 个远程图片链接`);
+
+		for (const match of matches) {
+			const [fullMatch, altText, imageUrl] = match;
+			console.log(`处理远程图片: ${imageUrl}`);
+			try {
+				// 使用重试机制下载图片
+				const imageResponse = await this.retry(async () => {
+					const resp = await fetch(imageUrl);
+					if (!resp.ok) {
+						throw new Error(`下载图片失败，HTTP状态码: ${resp.status}`);
+					}
+					return resp;
+				});
+
+				const imageBlob = await imageResponse.blob();
+				const imageArrayBuffer = await imageBlob.arrayBuffer();
+
+				// 生成文件名
+				const timestamp = new Date().getTime();
+				const fileName = `textin_image_${timestamp}.png`;
+
+				// 保存到 Obsidian 附件文件夹
+				const attachmentFolder = this.app.vault.getConfig('attachmentFolderPath') || 'attachments';
+				console.log(`保存图片到: ${attachmentFolder}/${fileName}`);
+				await this.app.vault.createBinary(
+					`${attachmentFolder}/${fileName}`,
+					imageArrayBuffer
+				);
+
+				// 替换 markdown 中的图片链接
+				const newLink = `![[${attachmentFolder}/${fileName}]]`;
+				console.log(`替换链接: ${fullMatch} -> ${newLink}`);
+				markdown = markdown.replace(
+					fullMatch,
+					newLink
+				);
+			} catch (error) {
+				console.error('处理远程图片失败:', error);
+				// 如果处理失败，保留原始链接
+			}
+		}
+
+		console.log('图片处理完成，返回处理后的 markdown');
+		return markdown;
 	}
 
 	// 转换数学公式格式
 	private convertMathFormula(text: string): string {
 		// 处理多行公式 \[ ... \]
 		text = text.replace(/\\\[\s*([\s\S]*?)\s*\\\]/g, '$$\n$1\n$$');
-		
+
 		// 处理行内公式 \( ... \)
 		text = text.replace(/\\\((.*?)\\\)/g, '$$$1$$');
-		
+
 		// 处理其他可能的公式格式
 		text = text.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
 			// 移除多余的空格
@@ -380,7 +463,7 @@ export default class ConknowReadingAssistant extends Plugin {
 
 		console.log('发送到 Deepseek 的请求:', {
 			url: `${this.settings.deepseekBaseUrl}/chat/completions`,
-			headers: {...headers, 'Authorization': 'Bearer ****'},
+			headers: { ...headers, 'Authorization': 'Bearer ****' },
 			body: body
 		});
 
@@ -391,7 +474,7 @@ export default class ConknowReadingAssistant extends Plugin {
 		});
 
 		console.log('Deepseek API 响应状态:', response.status, response.statusText);
-		
+
 		if (!response.ok) {
 			const errorText = await response.text();
 			console.error('Deepseek API 错误响应:', errorText);
@@ -403,7 +486,7 @@ export default class ConknowReadingAssistant extends Plugin {
 
 		try {
 			const result = JSON.parse(responseText);
-			
+
 			if (!result.choices || !result.choices[0] || !result.choices[0].message) {
 				console.error('Deepseek API 返回格式异常:', result);
 				throw new Error('API 返回格式错误');
