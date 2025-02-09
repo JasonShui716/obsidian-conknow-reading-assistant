@@ -10,6 +10,8 @@
 
 ![screenshot](./function_presentation.png)
 
+vx：c2h1aXNodWlqaWFvemk (base64，末尾加一个等号)
+
 ## 主要功能
 
 - **OCR 图片识别**
