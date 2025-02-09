@@ -1,0 +1,32 @@
+<view class="container">
+  <view class="header">
+    <text class="title">OCR文字识别</text>
+    <view class="settings-icon" bindtap="goToSettings">⚙️</view>
+  </view>
+
+  <view class="content">
+    <view class="preview-container" wx:if="{{tempImagePath}}">
+      <image class="preview-image" src="{{tempImagePath}}" mode="aspectFit"></image>
+      <view class="preview-actions">
+        <button class="action-button" bindtap="reselect">重新选择</button>
+        <button class="action-button primary" bindtap="startOCR">开始识别</button>
+      </view>
+    </view>
+
+    <view class="action-container" wx:else>
+      <button class="main-button" bindtap="chooseImage" data-source="album">
+        <text class="icon">📁</text>
+        <text>从相册选择</text>
+      </button>
+      
+      <button class="main-button" bindtap="chooseImage" data-source="camera">
+        <text class="icon">📷</text>
+        <text>拍照识别</text>
+      </button>
+    </view>
+  </view>
+
+  <view class="footer">
+    <button class="history-button" bindtap="goToHistory">历史记录</button>
+  </view>
+</view> 

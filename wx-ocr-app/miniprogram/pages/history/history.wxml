@@ -1,0 +1,21 @@
+<view class="container">
+  <view class="header">
+    <text class="title">历史记录</text>
+    <button class="clear-btn" bindtap="clearHistory" wx:if="{{history.length > 0}}">清空</button>
+  </view>
+
+  <scroll-view class="history-list" scroll-y wx:if="{{history.length > 0}}">
+    <view class="history-item" wx:for="{{history}}" wx:key="id" bindtap="viewResult" data-id="{{item.id}}">
+      <image class="item-image" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="item-content">
+        <view class="item-text">{{item.result}}</view>
+        <view class="item-time">{{item.formattedTime}}</view>
+      </view>
+      <view class="item-arrow">></view>
+    </view>
+  </scroll-view>
+
+  <view class="empty-state" wx:else>
+    <text class="empty-text">暂无历史记录</text>
+  </view>
+</view> 

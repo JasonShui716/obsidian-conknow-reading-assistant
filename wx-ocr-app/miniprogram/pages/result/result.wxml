@@ -1,0 +1,29 @@
+<view class="container">
+  <view class="image-section">
+    <image class="preview-image" src="{{ocrResult.image}}" mode="aspectFit"></image>
+  </view>
+
+  <view class="result-section">
+    <view class="section-header">
+      <text class="section-title">识别结果</text>
+      <view class="action-buttons">
+        <button class="action-btn" bindtap="copyText">复制文本</button>
+        <button class="action-btn" bindtap="analyzeText" wx:if="{{!analysis}}">AI分析</button>
+      </view>
+    </view>
+
+    <scroll-view class="result-content" scroll-y>
+      <text class="result-text" user-select>{{ocrResult.result}}</text>
+    </scroll-view>
+
+    <view class="analysis-section" wx:if="{{analysis}}">
+      <view class="section-header">
+        <text class="section-title">AI分析</text>
+        <button class="action-btn" bindtap="copyAnalysis">复制分析</button>
+      </view>
+      <scroll-view class="analysis-content" scroll-y>
+        <text class="analysis-text" user-select>{{analysis}}</text>
+      </scroll-view>
+    </view>
+  </view>
+</view> 

@@ -1,0 +1,93 @@
+<view class="container">
+  <view class="header">
+    <text class="title">设置</text>
+  </view>
+
+  <scroll-view class="settings-content" scroll-y>
+    <!-- TextIn OCR 设置 -->
+    <view class="section">
+      <view class="section-title">TextIn OCR 设置</view>
+      
+      <view class="setting-item">
+        <text class="setting-label">API 地址</text>
+        <input class="setting-input" 
+          value="{{settings.TEXTIN_API_URL}}"
+          placeholder="输入 API 地址"
+          data-key="TEXTIN_API_URL"
+          bindinput="handleInput"
+        />
+      </view>
+
+      <view class="setting-item">
+        <text class="setting-label">API ID</text>
+        <input class="setting-input" 
+          value="{{settings.TEXTIN_API_ID}}"
+          placeholder="输入 API ID"
+          data-key="TEXTIN_API_ID"
+          bindinput="handleInput"
+        />
+      </view>
+
+      <view class="setting-item">
+        <text class="setting-label">API Secret</text>
+        <input class="setting-input" 
+          value="{{settings.TEXTIN_API_SECRET}}"
+          placeholder="输入 API Secret"
+          password="true"
+          data-key="TEXTIN_API_SECRET"
+          bindinput="handleInput"
+        />
+      </view>
+    </view>
+
+    <!-- AI 设置 -->
+    <view class="section">
+      <view class="section-title">AI 设置</view>
+      
+      <view class="setting-item">
+        <text class="setting-label">API Base URL</text>
+        <input class="setting-input" 
+          value="{{settings.AI_BASE_URL}}"
+          placeholder="输入 API Base URL"
+          data-key="AI_BASE_URL"
+          bindinput="handleInput"
+        />
+      </view>
+
+      <view class="setting-item">
+        <text class="setting-label">API Key</text>
+        <input class="setting-input" 
+          value="{{settings.AI_API_KEY}}"
+          placeholder="输入 API Key"
+          password="true"
+          data-key="AI_API_KEY"
+          bindinput="handleInput"
+        />
+      </view>
+
+      <view class="setting-item">
+        <text class="setting-label">模型</text>
+        <input class="setting-input" 
+          value="{{settings.AI_MODEL}}"
+          placeholder="输入模型名称"
+          data-key="AI_MODEL"
+          bindinput="handleInput"
+        />
+      </view>
+
+      <view class="setting-item">
+        <text class="setting-label">系统提示词</text>
+        <textarea class="setting-textarea" 
+          value="{{settings.AI_SYSTEM_PROMPT}}"
+          placeholder="输入系统提示词"
+          data-key="AI_SYSTEM_PROMPT"
+          bindinput="handleInput"
+        />
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="footer">
+    <button class="save-button" bindtap="saveSettings">保存设置</button>
+  </view>
+</view> 
